@@ -1,6 +1,6 @@
 <p align="center"><img src="./docs/logo.jpg" alt="muya" height="150"></p>
 
-<p align="center"><b>Muya</b> — a standalone Markdown editor for the web, extracted from <a href="https://github.com/marktext/marktext">MarkText</a>.</p>
+<p align="center"><b>Muya</b> — a standalone Markdown editor for the web, extracted from <a href="https://github.com/marktext/marktext">MdStorm</a>.</p>
 
 > Status: Muya is still under active development. APIs may change between minor versions and it is not yet recommended for production use.
 
@@ -272,17 +272,17 @@ See [`docs/ROADMAP.md`](./docs/ROADMAP.md) for the long-running roadmap (TypeScr
 
 ## FAQ
 
-**What is the relationship between MarkText and Muya?**
+**What is the relationship between MdStorm and Muya?**
 
-Muya is derived from MarkText. The team's goal is for Muya to live outside the desktop app so it can power web editors as well; the Electron-specific assumptions have been progressively peeled away.
+Muya is derived from MdStorm. The team's goal is for Muya to live outside the desktop app so it can power web editors as well; the Electron-specific assumptions have been progressively peeled away.
 
-**Does the Muya version track MarkText's version?**
+**Does the Muya version track MdStorm's version?**
 
 No, the two version numbers are independent.
 
 ## Built with Muya
 
-- [MarkText](https://github.com/marktext/marktext) — next-generation Markdown editor for macOS, Windows, and Linux.
+- [MdStorm](https://github.com/marktext/marktext) — next-generation Markdown editor for macOS, Windows, and Linux.
 - [MindBox](https://www.mindbox.cc/) — note-taking app with first-class Markdown support.
 
 ## License

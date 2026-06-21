@@ -1,5 +1,5 @@
-appId: com.github.marktext.marktext
-productName: marktext
+appId: com.github.mdstorm
+productName: MdStorm
 directories:
   buildResources: build
   output: ../../dist
@@ -91,14 +91,14 @@ fileAssociations:
     role: Editor
     icon: icons/md.ico
 win:
-  executableName: marktext
-  artifactName: 'marktext-win-${arch}-${version}.${ext}'
+  executableName: 'mdstorm'
+  artifactName: 'mdstorm-win-${arch}-${version}.${ext}'
   target:
     - target: 'nsis'
     - target: 'zip'
-  icon: static/icon.ico
+  icon: static/MdStorm.ico
 nsis:
-  artifactName: 'marktext-win-${arch}-${version}-setup.${ext}'
+  artifactName: 'mdstorm-win-${arch}-${version}-setup.${ext}'
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: true
@@ -108,19 +108,22 @@ nsis:
   perMachine: false
   include: windows/installer.nsh
 mac:
-  artifactName: 'marktext-mac-${arch}-${version}.${ext}'
+  artifactName: 'mdstorm-mac-${arch}-${version}.${ext}'
   entitlementsInherit: build/mac/entitlements.mac.plist
   extendInfo:
     - NSCameraUsageDescription: Application requests access to the device's camera.
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
-  icon: static/icon.icns
+    - NSRequiresAquaSystemAppearance: false
+    - NSAppIconSecureInputFilter: true
+  icon: static/MdStorm.icon
   notarize: false
   target:
     - dmg
     - zip
 dmg:
-  artifactName: 'marktext-mac-${arch}-${version}.${ext}'
+  artifactName: 'mdstorm-mac-${arch}-${version}.${ext}'
+  title: 'MdStorm'
   contents:
     - x: 410
       y: 240
@@ -130,18 +133,18 @@ dmg:
       y: 240
       type: 'file'
 linux:
-  artifactName: 'marktext-linux-${version}.${ext}'
-  executableName: 'marktext'
+  artifactName: 'mdstorm-linux-${version}.${ext}'
+  executableName: 'mdstorm'
   description: 'A simple and elegant open-source markdown editor that focused on speed and usability.'
-  maintainer: 'MarkText Contributors'
+  maintainer: 'Luke Yeung'
   category: 'Office;TextEditor;Utility'
   mimeTypes:
     - 'text/markdown'
-  icon: 'static/icon.png'
+  icon: 'static/MdStorm-Linux-512x512@1x.png'
   desktop:
     entry:
-      StartupWMClass: 'marktext'
-      Keywords: 'marktext;'
+      StartupWMClass: 'mdstorm'
+      Keywords: 'mdstorm;'
   target:
     - AppImage
     - snap

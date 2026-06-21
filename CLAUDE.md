@@ -6,11 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MarkText is a WYSIWYG markdown editor built on Electron + Vue 3. It supports CommonMark, GitHub Flavored Markdown, math (KaTeX), Mermaid diagrams, PlantUML, and multiple editing modes (focus, typewriter, source-code).
+MdStorm is a WYSIWYG markdown editor built on Electron + Vue 3. It supports CommonMark, GitHub Flavored Markdown, math (KaTeX), Mermaid diagrams, PlantUML, and multiple editing modes (focus, typewriter, source-code).
 
 - **Version**: see `package.json`
 - **License**: MIT
-- **Repository**: https://github.com/marktext/marktext
+- **Repository**: https://github.com/michael32693/MdStorm
 
 ## Tech Stack
 

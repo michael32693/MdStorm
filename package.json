@@ -1,9 +1,9 @@
 {
-  "name": "marktext-monorepo",
-  "version": "0.20.0-dev",
-  "description": "MarkText monorepo root",
+  "name": "mdstorm",
+  "version": "0.0.1",
+  "description": "MdStorm",
   "private": true,
-  "homepage": "https://github.com/marktext/marktext",
+  "homepage": "https://github.com/michael32693/MdStorm",
   "packageManager": "pnpm@10.33.4",
   "engines": {
     "node": ">=20.19.0",

@@ -11,7 +11,7 @@ const writeLine = (s: string): boolean => write(s + '\n')
 const cli = (): ParsedArgs => {
   let argv = process.argv.slice(1)
   if (process.env.NODE_ENV === 'development') {
-    // Don't pass electron development arguments to MarkText and change user data path.
+    // Don't pass electron development arguments to MdStorm and change user data path.
     argv = ['--user-data-dir', path.join(getPath('appData'), 'marktext-dev')]
   }
 
@@ -35,7 +35,7 @@ const cli = (): ParsedArgs => {
   }
 
   if (args['--version']) {
-    writeLine(`MarkText: ${MARKTEXT_VERSION_STRING}`)
+    writeLine(`MdStorm: ${MARKTEXT_VERSION_STRING}`)
     writeLine(`Node.js: ${process.versions.node}`)
     writeLine(`Electron: ${process.versions.electron}`)
     writeLine(`Chromium: ${process.versions.chrome}`)

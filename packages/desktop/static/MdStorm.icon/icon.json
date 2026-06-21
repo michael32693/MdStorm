@@ -1,0 +1,93 @@
+{
+  "fill" : "automatic",
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "blend-mode-specializations" : [
+            {
+              "value" : "normal"
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "plus-lighter"
+            }
+          ],
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "display-p3:0.85148,0.43629,0.33174,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "extended-srgb:1.00000,0.80000,0.00000,1.00000"
+              }
+            }
+          ],
+          "glass" : false,
+          "image-name" : "Down.svg",
+          "name" : "Down",
+          "opacity" : 1,
+          "position" : {
+            "scale" : 4.1,
+            "translation-in-points" : [
+              231.390625,
+              2.0000000000004547
+            ]
+          }
+        },
+        {
+          "blend-mode-specializations" : [
+            {
+              "value" : "normal"
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "plus-lighter"
+            }
+          ],
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "display-p3:0.85148,0.43629,0.33174,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "extended-srgb:1.00000,0.80000,0.00000,1.00000"
+              }
+            }
+          ],
+          "glass" : false,
+          "image-name" : "Mark.svg",
+          "name" : "Mark",
+          "opacity" : 1,
+          "position" : {
+            "scale" : 4.1,
+            "translation-in-points" : [
+              -187.94181249999997,
+              2.0000000000002274
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

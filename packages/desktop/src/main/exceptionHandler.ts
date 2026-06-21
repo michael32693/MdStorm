@@ -89,12 +89,12 @@ ${title}.
 <Add steps or a markdown example to reproduce the problem.>
 
 ### Stack Trace
-
 \`\`\`\n${stack}\n\`\`\`
 
 ### Version
 
-MarkText: ${MARKTEXT_VERSION_STRING}
+MdStorm: ${MARKTEXT_VERSION_STRING}
+
 Operating system: ${getOSInformation()}`
         )
         break

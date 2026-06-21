@@ -1,34 +1,17 @@
 {
-  "name": "marktext",
-  "version": "0.20.0-dev",
-  "description": "MarkText",
+  "name": "mdstorm",
+  "version": "1.0.0-beta.1",
+  "description": "MdStorm Beta1",
   "main": "./out/main/index.js",
   "author": {
-    "name": "Jocs",
-    "email": "ransixi@gmail.com",
-    "url": "https://github.com/Jocs"
+    "name": "michael32693",
+    "email": "michael3269305@gmail.com",
+    "url": "https://github.com/michael32693/MdStorm"
   },
-  "maintainer": [
-    {
-      "name": "Jocs",
-      "email": "ransixi@gmail.com",
-      "url": "https://github.com/Jocs"
-    },
-    {
-      "name": "Felix Häusler",
-      "email": "hfelix@protonmail.ch",
-      "url": "https://github.com/fxha"
-    },
-    {
-      "name": "Tkaixiang",
-      "email": "tkaixiang@gmail.com",
-      "url": "https://github.com/Tkaixiang"
-    }
-  ],
-  "homepage": "https://github.com/marktext/marktext",
+  "homepage": "https://github.com/michael32693/MdStorm",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marktext/marktext.git"
+    "url": "git@github.com:michael32693/MdStorm.git"
   },
   "scripts": {
     "minify-locales": "tsx ../../scripts/minify-locales.ts",

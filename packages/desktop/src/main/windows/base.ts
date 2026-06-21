@@ -4,7 +4,7 @@ import { TypedEmitter } from '@shared/types/typedEmitter'
 import type Accessor from '../app/accessor'
 
 /**
- * A MarkText window.
+ * A MdStorm window.
  * @property id Identifier (= browserWindow.id) or null during initialization.
  * @property browserWindow The browser window.
  * @property lifecycle The window lifecycle state.

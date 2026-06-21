@@ -15,7 +15,7 @@ const MARKDOWN_EXTENSIONS = Object.freeze([
 ])
 
 /**
- * Returns true if the filename matches one of the markdown extensions allowed in MarkText.
+ * Returns true if the filename matches one of the markdown extensions allowed in MdStorm.
  *
  * @param {string} filename Path or filename
  */
