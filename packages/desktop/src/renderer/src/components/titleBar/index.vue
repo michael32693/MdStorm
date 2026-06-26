@@ -36,8 +36,9 @@
         <el-tooltip
           v-if="wordCount"
           class="item"
-          :content="`${wordCount[show]} ${HASH[show].full + (wordCount[show] > 1 ? 's' : '')}`"
+          :content="tooltipWordCount"
           placement="bottom-end"
+          :show-arrow="false"
         >
           <template #content>
             <div class="title-item">
@@ -54,7 +55,7 @@
             </div>
           </template>
           <div v-if="wordCount" class="word-count" @click.stop="handleWordClick">
-            <span class="text-center-vertical">{{ `${HASH[show].short} ${wordCount[show]}` }}</span>
+            <span class="text-center-vertical">{{ formattedWordCount }}</span>
           </div>
         </el-tooltip>
       </div>
@@ -159,6 +160,22 @@ const windowIconClose = closePath
 const isFullScreen = ref(false)
 const isMaximized = ref(false)
 const show = ref<'word' | 'paragraph' | 'character' | 'all'>('word')
+
+const currentWordCount = computed<number>(() => {
+  return props.wordCount?.[show.value] ?? 0
+})
+
+const tooltipWordCount = computed<string>(() => {
+  const count = currentWordCount.value
+  return `${count} ${HASH[show.value].full + (count > 1 ? 's' : '')}`
+})
+
+// Format the selected counter while preserving the compact title-bar display.
+const formattedWordCount = computed<string>(() => {
+  if (!props.wordCount) return ''
+  const count = currentWordCount.value.toLocaleString('en-US')
+  return show.value === 'word' ? `${count} 字` : `${HASH[show.value].short} ${count}`
+})
 
 onMounted(async () => {
   try {
@@ -377,7 +394,7 @@ div.title > span {
   align-items: center;
   flex-direction: row-reverse;
   & .item {
-    margin-right: 10px;
+    margin-right: 20px;
   }
 }
 

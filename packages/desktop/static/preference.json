@@ -16,11 +16,11 @@
   "treePathExcludePatterns": [],
   "language": "en",
 
-  "editorFontFamily": "Open Sans",
+  "editorFontFamily": "PingFang",
   "fontSize": 16,
   "lineHeight": 1.6,
   "codeFontSize": 14,
-  "codeFontFamily": "DejaVu Sans Mono",
+  "codeFontFamily": "JetBrains Mono",
   "codeBlockLineNumbers": false,
   "trimUnnecessaryCodeBlockEmptyLines": true,
   "wrapCodeBlocks": false,

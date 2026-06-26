@@ -32,9 +32,9 @@ const preferencesStore = usePreferencesStore()
 const { theme, titleBarStyle } = storeToRefs(preferencesStore)
 
 const showCustomTitleBar = computed<boolean>(() => {
-  // Always show the custom title bar on macOS to provide a close button
+  // macOS uses native traffic lights via titleBarStyle: 'hiddenInset'
   if (isOsx) {
-    return true
+    return false
   }
   return titleBarStyle.value === 'custom'
 })
@@ -124,6 +124,11 @@ onMounted(() => {
       height: calc(100vh - var(--titleBarHeight));
       overflow: auto;
     }
+    &.frameless .pref-setting {
+      /* Move the scrollbar below the titlebar */
+      margin-top: var(--titleBarHeight);
+      padding-top: 0;
+    }
     & span,
     & div,
     & h1,
@@ -134,11 +139,6 @@ onMounted(() => {
     & h6 {
       user-select: none;
     }
-  }
-  & .pref-content.frameless .pref-setting {
-    /* Move the scrollbar below the titlebar */
-    margin-top: var(--titleBarHeight);
-    padding-top: 0;
   }
 }
 </style>

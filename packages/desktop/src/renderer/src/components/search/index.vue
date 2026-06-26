@@ -100,7 +100,7 @@
             effect="dark"
             :content="t('search.replaceAll')"
             placement="top"
-            :visible-arrow="false"
+            :show-arrow="false"
             :open-delay="1000"
           >
             <button
@@ -117,7 +117,7 @@
             effect="dark"
             :content="t('search.replaceSingle')"
             placement="top"
-            :visible-arrow="false"
+            :show-arrow="false"
             :open-delay="1000"
           >
             <button

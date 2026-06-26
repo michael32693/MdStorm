@@ -279,6 +279,7 @@ export interface IpcMainEventChannels {
   'mt::update-object-tree': [payload: unknown]
   'mt::user-preference': [partial: unknown]
   'mt::window-active-status': [active: boolean]
+  'mt::window-child-modal-state': [blocked: boolean]
   'mt::window-enter-full-screen': []
   'mt::window-leave-full-screen': []
   'mt::window-maximize': []

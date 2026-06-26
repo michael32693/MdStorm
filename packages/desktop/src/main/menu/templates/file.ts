@@ -184,8 +184,8 @@ export default function(
       label: t('menu.file.preferences'),
       accelerator: keybindings.getAccelerator('file.preferences') ?? undefined,
       visible: !isOsx,
-      click() {
-        userSetting()
+      click(_menuItem, browserWindow) {
+        userSetting((browserWindow as BrowserWindow | undefined) ?? null)
       }
     },
     {

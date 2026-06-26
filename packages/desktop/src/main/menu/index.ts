@@ -9,7 +9,7 @@ import { updateFormatMenu } from '../menu/actions/format'
 import { updateSelectionMenus, type SelectionState } from '../menu/actions/paragraph'
 import { onInternalChannel } from '../utils/internalIpc'
 import { viewLayoutChanged } from '../menu/actions/view'
-import configureMenu, { configSettingMenu } from '../menu/templates'
+import configureMenu from '../menu/templates'
 import { setLanguage } from '../i18n.js'
 import type Preference from '../preferences'
 import type Keybindings from '../keyboard/shortcutHandler'
@@ -236,16 +236,13 @@ class AppMenu {
    *
    * @param windowId The window id.
    */
-  getWindowMenuById(windowId: number): Menu {
+  getWindowMenuById(windowId: number): Menu | null {
     const menu = this.windowMenus.get(windowId)
     if (!menu) {
       log.error(`getWindowMenuById: Cannot find window menu for window id ${windowId}.`)
       throw new Error(`Cannot find window menu for id ${windowId}.`)
     }
-    // The original JS returns `menu.menu` directly; settings menus on non-macOS
-    // platforms have `menu: null`, in which case the consumer is responsible
-    // for handling the null/undefined return.
-    return menu.menu as Menu
+    return menu.menu as Menu | null
   }
 
   /**
@@ -317,6 +314,7 @@ class AppMenu {
    */
   updateLineEndingMenu(windowId: number, lineEnding: string): void {
     const menus = this.getWindowMenuById(windowId)
+    if (!menus) return
     const crlfMenu = menus.getMenuItemById('crlfLineEndingMenuEntry')
     const lfMenu = menus.getMenuItemById('lfLineEndingMenuEntry')
     if (lineEnding === 'crlf') {
@@ -334,6 +332,7 @@ class AppMenu {
    */
   updateAlwaysOnTopMenu(windowId: number, flag: boolean): void {
     const menus = this.getWindowMenuById(windowId)
+    if (!menus) return
     const menu = menus.getMenuItemById('alwaysOnTopMenuItem')
     if (menu) menu.checked = flag
   }
@@ -400,17 +399,13 @@ class AppMenu {
   }
 
   _buildSettingMenu(): WindowMenuEntry {
-    if (isOsx) {
-      const menuTemplate = configSettingMenu(this._keybindings)
-      const menu = Menu.buildFromTemplate(menuTemplate)
-      return { menu, type: MenuType.SETTINGS }
-    }
+    // The preference window has no application menu on any platform.
     return { menu: null, type: MenuType.SETTINGS }
   }
 
   _setApplicationMenu(menu: Menu | null): void {
-    if (isLinux && !menu) {
-      // WORKAROUND for Electron#16521: We cannot hide the (application) menu on Linux.
+    if (!menu) {
+      // Set an empty dummy menu so the menu bar is cleared on all platforms.
       const dummyMenu = Menu.buildFromTemplate([])
       Menu.setApplicationMenu(dummyMenu)
     } else {
@@ -447,7 +442,7 @@ class AppMenu {
           log.error(`UpdateApplicationMenu: Cannot find window menu for window id ${windowId}.`)
           return
         }
-        updateFormatMenu(this.getWindowMenuById(windowId), formats)
+        updateFormatMenu(this.getWindowMenuById(windowId)!, formats)
       }
     )
     ipcMain.on('mt::update-sidebar-menu', (_e, windowId: number, value: unknown) => {
@@ -455,7 +450,7 @@ class AppMenu {
         log.error(`UpdateApplicationMenu: Cannot find window menu for window id ${windowId}.`)
         return
       }
-      updateSidebarMenu(this.getWindowMenuById(windowId), value)
+      updateSidebarMenu(this.getWindowMenuById(windowId)!, value)
     })
     ipcMain.on(
       'mt::view-layout-changed',
@@ -464,7 +459,7 @@ class AppMenu {
           log.error(`UpdateApplicationMenu: Cannot find window menu for window id ${windowId}.`)
           return
         }
-        viewLayoutChanged(this.getWindowMenuById(windowId), viewSettings)
+        viewLayoutChanged(this.getWindowMenuById(windowId)!, viewSettings)
       }
     )
     ipcMain.on('mt::editor-selection-changed', (_e, windowId: number, changes: SelectionState) => {
@@ -472,7 +467,7 @@ class AppMenu {
         log.error(`UpdateApplicationMenu: Cannot find window menu for window id ${windowId}.`)
         return
       }
-      updateSelectionMenus(this.getWindowMenuById(windowId), changes)
+      updateSelectionMenus(this.getWindowMenuById(windowId)!, changes)
     })
 
     onInternalChannel('menu-add-recently-used', (pathname: string) => {

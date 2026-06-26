@@ -3,18 +3,31 @@
     <div
       ref="folderEl"
       class="folder-name"
-      :style="{ 'padding-left': `${depth * 6 + 10}px` }"
+      :style="{ 'padding-left': `${depth * 20 + 10}px` }"
       :class="[{ active: folder.id === activeItem.id }]"
       :title="folder.pathname"
       @click="folderNameClick"
+      @dblclick="folderNameDblclick"
     >
-      <el-icon
-        class="icon-arrow"
-        :class="{ fold: isCollapsed }"
-        :size="12"
+      <button
+        type="button"
+        class="icon-arrow-button"
+        :class="isCollapsed ? 'icon-arrow-collapsed' : 'icon-arrow-expanded'"
+        aria-label="Toggle folder"
+        @click.stop="toggleCollapse"
+        @dblclick.stop
       >
-        <ArrowRight />
-      </el-icon>
+        <component
+          :is="isCollapsed ? CollapseRightIcon : CollapseDownIcon"
+          class="icon-arrow"
+          aria-hidden="true"
+        />
+      </button>
+      <component
+        :is="isCollapsed ? FolderClosedIcon : FolderOpenedIcon"
+        class="folder-icon"
+        aria-hidden="true"
+      />
       <input
         v-if="renameCache === folder.pathname"
         ref="renameInput"
@@ -45,7 +58,7 @@
         v-model="createName"
         type="text"
         class="new-input"
-        :style="{ 'margin-left': `${depth * 5 + 15}px` }"
+        :style="{ 'margin-left': `${(depth + 1) * 20 + 10}px` }"
         @keypress.enter="handleInputEnter"
       >
       <File
@@ -65,7 +78,10 @@ import { useProjectStore } from '@/store/project'
 import { showContextMenu } from '../../contextMenu/sideBar'
 import bus from '../../bus'
 import File from './treeFile.vue'
-import { ArrowRight } from '@element-plus/icons-vue'
+import CollapseDownIcon from '@/assets/icons/CollapseDown.svg'
+import CollapseRightIcon from '@/assets/icons/CollapseRight.svg'
+import FolderOpenedIcon from '@/assets/icons/FolderOpened.svg'
+import FolderClosedIcon from '@/assets/icons/FolderClosed.svg'
 import type { TreeFolderNode } from './types'
 
 const props = defineProps<{
@@ -90,14 +106,21 @@ const { createCache } = storeToRefs(projectStore)
 const { activeItem } = storeToRefs(projectStore)
 const { clipboard } = storeToRefs(projectStore)
 
+const getCreateCacheDirname = (): string | undefined => {
+  const cache = createCache.value as { dirname?: string }
+  return cache.dirname
+}
+
 const handleInputFocus = (): void => {
+  if (getCreateCacheDirname() !== props.folder.pathname) {
+    return
+  }
+
+  isCollapsed.value = false
   nextTick(() => {
     if (input.value) {
       input.value.focus()
       createName.value = ''
-      if (props.folder) {
-        isCollapsed.value = false
-      }
     }
   })
 }
@@ -107,6 +130,14 @@ const handleInputEnter = (): void => {
 }
 
 const folderNameClick = (): void => {
+  projectStore.CHANGE_ACTIVE_ITEM(props.folder)
+}
+
+const folderNameDblclick = (): void => {
+  isCollapsed.value = !isCollapsed.value
+}
+
+const toggleCollapse = (): void => {
   isCollapsed.value = !isCollapsed.value
 }
 
@@ -132,7 +163,7 @@ onMounted(() => {
     folderEl.value.addEventListener('contextmenu', (event) => {
       event.preventDefault()
       projectStore.CHANGE_ACTIVE_ITEM(props.folder)
-      showContextMenu(event, !!clipboard.value)
+      showContextMenu(event, !!clipboard.value, 'folder')
     })
   }
   bus.on('SIDEBAR::show-new-input', handleInputFocus)
@@ -149,15 +180,46 @@ onMounted(() => {
     align-items: center;
     height: 30px;
     padding-right: 15px;
-    & > .icon-arrow {
+    & > .icon-arrow-button {
       flex-shrink: 0;
-      color: var(--sideBarIconColor);
-      margin-right: 5px;
-      transition: transform 0.25s ease-out;
-      transform: rotate(90deg);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 24px;
+      height: 30px;
+      padding: 0;
+      border: 0;
+      margin: 0;
+      background: transparent;
+      cursor: pointer;
+      color: inherit;
     }
-    & > .icon-arrow.fold {
-      transform: rotate(0);
+    & > .icon-arrow-collapsed {
+      color: color-mix(in srgb, var(--sideBarTextColor), var(--sideBarBgColor) 45%);
+    }
+    & > .icon-arrow-expanded {
+      color: var(--sideBarTextColor);
+    }
+    & > .icon-arrow-button:focus-visible {
+      outline: 1px solid var(--highlightThemeColor);
+      outline-offset: -3px;
+    }
+    .icon-arrow {
+      display: block;
+      width: 12px;
+      height: 12px;
+      overflow: visible;
+      pointer-events: none;
+      position: relative;
+      top: -1px;
+    }
+    & > .folder-icon {
+      flex-shrink: 0;
+      display: block;
+      width: 16px;
+      height: 16px;
+      margin-right: 5px;
+      color: #b27c00;
     }
     &:hover {
       background: var(--sideBarItemHoverBgColor);

@@ -4,7 +4,7 @@ import Content from '../content';
 // Regression suite for marktext muya auto-pair commits being migrated as
 // part of PR-3b. Auto-pairing is the input-handler logic that decides
 // whether typing `(`, `*`, `"` etc. should also insert the matching
-// closing character.  In the new architecture the logic lives in
+// closing character.  In the new design the logic lives in
 // `Content.autoPair` (packages/core/src/block/base/content.ts).
 //
 // `autoPair` only relies on `this.text`, `this.selection.{anchor,focus}`
@@ -172,7 +172,7 @@ describe('autoPair — 4278362f no markdown-syntax pairing inside inline math', 
 });
 
 // ── marktext 701fb9ae "Append soft-lines on text removal" (#2853) ────────
-// The new architecture replaced the old `inputCtrl.removeBlocks` path
+// The new design replaced the old `inputCtrl.removeBlocks` path
 // with native browser deletion + an OT-json1 apply via
 // `Editor.updateContents`, so the original multi-paragraph fix is gone.
 // What survived in `autoPair` is the *single-paragraph* counterpart:

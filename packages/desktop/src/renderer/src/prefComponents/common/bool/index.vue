@@ -20,6 +20,7 @@
         class="item"
         effect="dark"
         placement="top-start"
+        :show-arrow="false"
       >
         <InfoFilled
           width="16"

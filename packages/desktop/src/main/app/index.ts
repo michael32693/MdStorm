@@ -496,9 +496,11 @@ class App {
   /**
    * Create a new setting window.
    */
-  private _createSettingWindow(category?: string | null): void {
+  private _createSettingWindow(category?: string | null, parentWindow?: BrowserWindow | null): void {
     const setting = new SettingWindow(this._accessor)
-    setting.createWindow(category ?? null)
+    const fallbackEditor = this._windowManager.getActiveEditor()
+    const parent = parentWindow ?? fallbackEditor?.browserWindow ?? undefined
+    setting.createWindow(category ?? null, parent)
     this._windowManager.add(setting)
     if (this._windowManager.windowCount === 1) {
       this._accessor.menu.setActiveWindow(setting.id!)
@@ -639,20 +641,19 @@ class App {
     pathsToOpen.length = 0
   }
 
-  private _openSettingsWindow(category?: string | null): void {
+  private _openSettingsWindow(category?: string | null, parentWindow?: BrowserWindow | null): void {
     const settingWins = this._windowManager.getWindowsByType(WindowType.SETTINGS)
     if (settingWins.length >= 1) {
       // A setting window is already created
       const browserSettingWindow = settingWins[0].win.browserWindow!
       browserSettingWindow.webContents.send('settings::change-tab', category)
-      if (isLinux) {
-        browserSettingWindow.focus()
-      } else {
-        browserSettingWindow.moveTop()
-      }
+      if (browserSettingWindow.isMinimized()) browserSettingWindow.restore()
+      if (!browserSettingWindow.isVisible()) browserSettingWindow.show()
+      browserSettingWindow.moveTop()
+      browserSettingWindow.focus()
       return
     }
-    this._createSettingWindow(category)
+    this._createSettingWindow(category, parentWindow)
   }
 
   private _listenForIpcMain(): void {
@@ -705,9 +706,12 @@ class App {
       }
     })
 
-    onInternalChannel('app-create-settings-window', (category?: string) => {
-      this._openSettingsWindow(category)
-    })
+    onInternalChannel(
+      'app-create-settings-window',
+      (category?: string | null, parentWindow?: BrowserWindow | null) => {
+        this._openSettingsWindow(category, parentWindow)
+      }
+    )
 
     onInternalChannel('app-open-file-by-id', (windowId: number, filePath: string) => {
       const openFilesInNewWindow = this._accessor.preferences.getItem<boolean>('openFilesInNewWindow')
@@ -798,8 +802,8 @@ class App {
       }
     })
 
-    ipcMain.on('mt::open-setting-window', () => {
-      this._openSettingsWindow()
+    ipcMain.on('mt::open-setting-window', (e) => {
+      this._openSettingsWindow(null, BrowserWindow.fromWebContents(e.sender))
     })
 
     ipcMain.on('mt::make-screenshot', (e) => {

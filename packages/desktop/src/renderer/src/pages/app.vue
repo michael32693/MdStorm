@@ -34,11 +34,15 @@
       <rename />
       <import-modal />
     </div>
+    <div
+      v-if="childWindowBlocksInteraction"
+      class="child-window-interaction-blocker"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, nextTick, onMounted, ref } from 'vue'
+import { computed, watch, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useMainStore } from '@/store'
 import { storeToRefs } from 'pinia'
 import { addStyles, addThemeStyle, addCustomStyle, type AddStylesOptions } from '@/util/theme'
@@ -73,6 +77,8 @@ const commandCenterStore = useCommandCenterStore()
 const notificationStore = useNotificationStore()
 
 const timer = ref<ReturnType<typeof setTimeout> | null>(null)
+const childWindowBlocksInteraction = ref(false)
+let offChildWindowModalState: (() => void) | null = null
 
 // States from Pinia
 const { windowActive, platform, init } = storeToRefs(mainStore)
@@ -198,6 +204,13 @@ onMounted(async () => {
   editorStore.LISTEN_FOR_CONTEXT_MENU()
   editorStore.LISTEN_FOR_STATE_REPLACE()
 
+  offChildWindowModalState = window.electron.ipcRenderer.on(
+    'mt::window-child-modal-state',
+    (_event, blocked) => {
+      childWindowBlocksInteraction.value = blocked
+    }
+  )
+
   // module: notification
   notificationStore.listenForNotification()
 
@@ -216,6 +229,11 @@ onMounted(async () => {
     }
     addStyles(style)
   })
+})
+
+onBeforeUnmount(() => {
+  offChildWindowModalState?.()
+  offChildWindowModalState = null
 })
 </script>
 
@@ -250,5 +268,14 @@ onMounted(async () => {
   & > .editor {
     flex: 1;
   }
+}
+.child-window-interaction-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: transparent;
+  pointer-events: all;
+  cursor: default;
+  -webkit-app-region: no-drag;
 }
 </style>

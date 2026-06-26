@@ -11,26 +11,46 @@ import {
 } from './menuItems'
 import { popupContextMenu, type ContextMenuItem } from '../popupMenu'
 
+export type SideBarTargetType = 'file' | 'folder'
+
 export const showContextMenu = (
   event: { clientX: number; clientY: number },
-  hasPathCache: boolean
+  hasPathCache: boolean,
+  targetType: SideBarTargetType
 ): void => {
-  const contextItems: ContextMenuItem[] = [
-    getNewFile(),
-    getNewDirectory(),
-    SEPARATOR,
-    getCOPY(),
-    getCUT(),
-    getPASTE(),
-    SEPARATOR,
-    getRENAME(),
-    getDELETE(),
-    SEPARATOR,
-    getShowInFolder()
-  ]
+  // Folders offer create/new-file/new-directory; files do not.
+  const contextItems: ContextMenuItem[] =
+    targetType === 'folder'
+      ? [
+          getNewFile(),
+          getNewDirectory(),
+          SEPARATOR,
+          getCOPY(),
+          getCUT(),
+          getPASTE(),
+          SEPARATOR,
+          getRENAME(),
+          getDELETE(),
+          SEPARATOR,
+          getShowInFolder()
+        ]
+      : [
+          getCOPY(),
+          getCUT(),
+          SEPARATOR,
+          getRENAME(),
+          getDELETE(),
+          SEPARATOR,
+          getShowInFolder()
+        ]
 
-  // PASTE entry (index 5) toggles based on the cached source path.
-  contextItems[5].enabled = hasPathCache
+  // PASTE entry toggles based on the cached source path. In the folder
+  // menu it lives at index 5; in the file menu (no create entries) it is
+  // absent — pasting targets the active directory, which only folders
+  // represent.
+  if (targetType === 'folder') {
+    contextItems[5].enabled = hasPathCache
+  }
 
   const items: ContextMenuItem[] = contextItems.map((item) => {
     if (!item || item.type === 'separator') return item

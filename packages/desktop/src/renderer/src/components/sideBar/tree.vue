@@ -4,76 +4,29 @@
       <!-- Placeholder -->
     </div>
 
-    <!-- Opened tabs -->
-    <div v-if="openedFilesInSidebar" class="opened-files">
-      <div class="title">
-        <el-icon
-          class="icon-arrow"
-          :class="{ fold: !showOpenedFiles }"
-          :size="12"
-          @click.stop="toggleOpenedFiles()"
-        >
-          <ArrowRight />
-        </el-icon>
-        <span
-          class="default-cursor text-overflow"
-          @click.stop="toggleOpenedFiles()"
-        >{{
-          t('sideBar.tree.openedFiles')
-        }}</span>
-        <a
-          href="javascript:;"
-          :title="t('sideBar.tree.saveAll')"
-          @click.stop="saveAll(false)"
-        >
-          <svg
-            class="icon"
-            aria-hidden="true"
-          >
-            <use xlink:href="#icon-save-all" />
-          </svg>
-        </a>
-        <a
-          href="javascript:;"
-          :title="t('sideBar.tree.closeAll')"
-          @click.stop="saveAll(true)"
-        >
-          <svg
-            class="icon"
-            aria-hidden="true"
-          >
-            <use xlink:href="#icon-close-all" />
-          </svg>
-        </a>
-      </div>
-      <div
-        v-show="showOpenedFiles"
-        class="opened-files-list"
-      >
-        <transition-group name="list">
-          <opened-file
-            v-for="tab of tabs"
-            :key="tab.id"
-            :file="tab"
-          />
-        </transition-group>
-      </div>
-    </div>
-
     <!-- Project tree view -->
     <div
       v-if="projectTree"
       class="project-tree"
     >
-      <div class="title">
-        <el-icon
-          class="icon-arrow"
-          :class="{ fold: !showDirectories }"
-          :size="12"
+      <div
+        ref="projectTitleEl"
+        class="title"
+        @contextmenu="handleProjectContextMenu"
+      >
+        <button
+          type="button"
+          class="icon-arrow-button"
+          :class="showDirectories ? 'icon-arrow-expanded' : 'icon-arrow-collapsed'"
+          aria-label="Toggle project folder"
           @click.stop="toggleDirectories()"
         >
-          <ArrowRight />
-        </el-icon>
+          <component
+            :is="showDirectories ? CollapseDownIcon : CollapseRightIcon"
+            class="icon-arrow"
+            aria-hidden="true"
+          />
+        </button>
         <span
           class="default-cursor text-overflow"
           @click.stop="toggleDirectories()"
@@ -98,7 +51,7 @@
           placeholder="Enter .md file name"
           type="text"
           class="new-input"
-          :style="{ 'margin-left': `${depth * 5 + 15}px` }"
+          :style="{ 'margin-left': `${(depth + 1) * 20 + 10}px` }"
           @keypress.enter="handleInputEnter"
         >
         <file
@@ -149,15 +102,16 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useProjectStore } from '@/store/project'
-import { useEditorStore } from '@/store/editor'
-import { usePreferencesStore } from '@/store/preferences'
 import Folder from './treeFolder.vue'
 import File from './treeFile.vue'
-import OpenedFile from './treeOpenedTab.vue'
 import bus from '../../bus'
 import { useI18n } from 'vue-i18n'
-import { ArrowRight } from '@element-plus/icons-vue'
-import type { TreeNode, TabDescriptor } from './types'
+import { showContextMenu } from '../../contextMenu/sideBar'
+import CollapseDownIcon from '@/assets/icons/CollapseDown.svg'
+import CollapseRightIcon from '@/assets/icons/CollapseRight.svg'
+import FolderOpenedIcon from '@/assets/icons/FolderOpened.svg'
+import FolderClosedIcon from '@/assets/icons/FolderClosed.svg'
+import type { TreeNode } from './types'
 
 const { t } = useI18n()
 
@@ -167,23 +121,19 @@ const props = defineProps<{
   // `v-if="projectTree"`. Type the prop nullable to match runtime + the
   // template guard.
   projectTree: TreeNode | null
-  openedFiles?: TabDescriptor[]
-  tabs?: TabDescriptor[]
 }>()
 
 const depth = 0
 const showDirectories = ref(true)
-const showOpenedFiles = ref(true)
 const createName = ref('')
 const input = ref<HTMLInputElement | null>(null)
+const projectTitleEl = ref<HTMLDivElement | null>(null)
 
 const projectStore = useProjectStore()
-const editorStore = useEditorStore()
-const preferencesStore = usePreferencesStore()
 
 // Computed properties
 const { createCache } = storeToRefs(projectStore)
-const { openedFilesInSidebar } = storeToRefs(preferencesStore)
+const { clipboard } = storeToRefs(projectStore)
 
 // The createCache state is `{ dirname, type }` while an input is shown, and
 // `{}` otherwise. Expose a typed accessor for the template so we don't have
@@ -198,25 +148,28 @@ const openFolder = (): void => {
   projectStore.ASK_FOR_OPEN_PROJECT()
 }
 
-const saveAll = (isClose: boolean): void => {
-  editorStore.ASK_FOR_SAVE_ALL(isClose)
-}
-
 const createFile = (): void => {
   projectStore.CHANGE_ACTIVE_ITEM(props.projectTree)
   bus.emit('SIDEBAR::new', 'file')
-}
-
-const toggleOpenedFiles = (): void => {
-  showOpenedFiles.value = !showOpenedFiles.value
 }
 
 const toggleDirectories = (): void => {
   showDirectories.value = !showDirectories.value
 }
 
+const handleProjectContextMenu = (event: MouseEvent): void => {
+  event.preventDefault()
+  if (!props.projectTree) return
+  projectStore.CHANGE_ACTIVE_ITEM(props.projectTree)
+  showContextMenu(event, !!clipboard.value, 'folder')
+}
+
 // From createFileOrDirectoryMixins
 const handleInputFocus = (): void => {
+  if (createCacheDirname.value === props.projectTree?.pathname) {
+    showDirectories.value = true
+  }
+
   nextTick(() => {
     if (input.value) {
       input.value.focus()
@@ -291,65 +244,47 @@ onMounted(() => {
   flex-direction: row-reverse;
 }
 
-.icon-arrow {
-  margin-right: 5px;
-  transition: transform 0.25s ease-out;
-  transform: rotate(90deg);
-  color: var(--sideBarTextColor);
-  cursor: pointer;
-}
-
-.icon-arrow.fold {
-  transform: rotate(0);
-}
-
-.opened-files > .title,
-.project-tree > .title {
-  height: 30px;
-  line-height: 30px;
-  font-size: 14px;
-}
-
-.opened-files .title {
-  padding-right: 15px;
+.icon-arrow-button {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-}
-
-.opened-files .title > span {
-  flex: 1;
-}
-
-.opened-files .title > a {
-  display: none;
-  text-decoration: none;
-  color: var(--sideBarColor);
-  margin-left: 8px;
-}
-.opened-files div.title:hover > a,
-.opened-files div.title > a:hover {
-  display: block;
-}
-
-.opened-files div.title:hover > a:hover,
-.opened-files div.title > a:hover:hover {
-  color: var(--highlightThemeColor);
-}
-.opened-files {
-  display: flex;
-  flex-direction: column;
-}
-.default-cursor {
+  justify-content: flex-start;
+  width: 24px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  margin: 0;
+  background: transparent;
   cursor: pointer;
+  color: inherit;
 }
-.opened-files .opened-files-list {
-  max-height: 112px;
-  overflow: auto;
-  flex: 1;
+.icon-arrow-button:focus-visible {
+  outline: 1px solid var(--highlightThemeColor);
+  outline-offset: -3px;
+}
+.icon-arrow {
+  display: block;
+  width: 12px;
+  height: 12px;
+  overflow: visible;
+  pointer-events: none;
+  position: relative;
+  top: -1px;
+}
+.icon-arrow-collapsed {
+  color: color-mix(in srgb, var(--sideBarTextColor), var(--sideBarBgColor) 45%);
+}
+.icon-arrow-expanded {
+  color: var(--sideBarTextColor);
 }
 
-.opened-files .opened-files-list::-webkit-scrollbar:vertical {
-  width: 8px;
+.folder-icon {
+  flex-shrink: 0;
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+  color: #b27c00;
 }
 
 .project-tree {
@@ -360,6 +295,8 @@ onMounted(() => {
 }
 
 .project-tree > .title {
+  height: 30px;
+  font-size: 14px;
   padding-right: 15px;
   display: flex;
   align-items: center;
@@ -396,6 +333,9 @@ onMounted(() => {
 }
 .project-tree div.title:hover > a {
   opacity: 1;
+}
+.default-cursor {
+  cursor: pointer;
 }
 .open-project {
   flex: 1;

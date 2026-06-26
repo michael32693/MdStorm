@@ -25,8 +25,8 @@ export default function(keybindings: Keybindings): MenuItemConstructorOptions {
       {
         label: t('menu.marktext.preferences'),
         accelerator: keybindings.getAccelerator('file.preferences') ?? undefined,
-        click() {
-          actions.userSetting()
+        click(_menuItem, focusedWindow) {
+          actions.userSetting((focusedWindow as BrowserWindow | undefined) ?? null)
         }
       },
       {

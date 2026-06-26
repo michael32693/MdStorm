@@ -66,8 +66,8 @@ ipcMain.on('mt::check-for-update', (e) => {
 
 // --------------------------------------------------------
 
-export const userSetting = (): void => {
-  ipcMain.emit('app-create-settings-window')
+export const userSetting = (browserWindow?: BrowserWindow | null): void => {
+  ipcMain.emit('app-create-settings-window', null, browserWindow)
 }
 
 export const checkUpdates = (browserWindow: BrowserWindow | null): void => {

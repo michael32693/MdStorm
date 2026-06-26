@@ -2008,6 +2008,11 @@ onBeforeUnmount(() => {
 .editor-component .mu-container {
   padding-top: 20px;
   padding-bottom: 100vh;
+  cursor: text;
+}
+
+.editor-component .mu-thematic-break:not(.mu-active) {
+  cursor: default;
 }
 
 .typewriter .editor-component {

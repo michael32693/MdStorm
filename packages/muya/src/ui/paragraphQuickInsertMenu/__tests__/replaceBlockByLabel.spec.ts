@@ -35,7 +35,7 @@ interface IFakeBlock {
 // The marktext fix branched: `if (marker) { …split-and-strip… } else
 // { listItemLines = lines /* take the whole input verbatim */ }`.
 //
-// The new architecture has no `updateParagraphToList` at all — front-menu
+// The new design has no `updateParagraphToList` at all — front-menu
 // conversion is `replaceBlockByLabel({label: 'bullet-list', text})`, which
 // builds the new list from `deepClone(emptyStates['bullet-list'])` and assigns
 // the whole `text` to `state.children[0].children[0].text` (a single

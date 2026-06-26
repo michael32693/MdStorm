@@ -168,17 +168,29 @@ body {
   border: solid 1px var(--floatBorderColor);
 }
 
-.el-tooltip__popper[data-popper-placement^='left'] .popper__arrow {
-  border-left-color: #303133;
+/* Hide arrows on all poppers/dropdowns/tooltips/popovers and close the
+ * gap left behind by the arrow offset (popper reserves ~6px for the arrow
+ * via its offset modifier; pull the popper back toward the trigger). */
+.el-popper__arrow,
+.el-popper .el-popper__arrow,
+.el-tooltip__popper .el-popper__arrow,
+.el-select-dropdown .el-popper__arrow,
+.el-dropdown__popper .el-popper__arrow,
+.el-popover .el-popper__arrow {
+  display: none !important;
 }
-.el-tooltip__popper[data-popper-placement^='top'] .popper__arrow {
-  border-top-color: #303133;
+
+.el-popper[data-popper-placement^='top'] {
+  margin-bottom: 0 !important;
 }
-.el-tooltip__popper[data-popper-placement^='right'] .popper__arrow {
-  border-right-color: #303133;
+.el-popper[data-popper-placement^='bottom'] {
+  margin-top: 0 !important;
 }
-.el-tooltip__popper[data-popper-placement^='bottom'] .popper__arrow {
-  border-bottom-color: #303133;
+.el-popper[data-popper-placement^='left'] {
+  margin-right: 0 !important;
+}
+.el-popper[data-popper-placement^='right'] {
+  margin-left: 0 !important;
 }
 
 .el-button:hover,

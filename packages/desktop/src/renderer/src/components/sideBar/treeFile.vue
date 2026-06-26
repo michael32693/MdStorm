@@ -3,7 +3,7 @@
     ref="fileEl"
     :title="file.pathname"
     class="side-bar-file"
-    :style="{ 'padding-left': `${depth * 6 + 10}px`, opacity: file.isMarkdown ? 1 : 0.75 }"
+    :style="{ 'padding-left': `${depth * 20 + 10}px`, opacity: file.isMarkdown ? 1 : 0.75 }"
     :class="[
       { current: currentFile?.pathname === file.pathname, active: file.id === activeItem.id }
     ]"
@@ -87,7 +87,7 @@ onMounted(() => {
     fileEl.value.addEventListener('contextmenu', (event) => {
       event.preventDefault()
       projectStore.CHANGE_ACTIVE_ITEM(props.file)
-      showContextMenu(event, !!clipboard.value)
+      showContextMenu(event, !!clipboard.value, 'file')
     })
   }
 
@@ -113,21 +113,6 @@ onMounted(() => {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  &::before {
-    content: '';
-    position: absolute;
-    display: block;
-    left: 0;
-    background: var(--themeColor);
-    width: 2px;
-    height: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    transition: all 0.2s ease;
-  }
-}
-.side-bar-file.current::before {
-  height: 100%;
 }
 .side-bar-file.current > span {
   color: var(--themeColor);

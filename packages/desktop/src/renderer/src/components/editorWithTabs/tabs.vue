@@ -1,5 +1,8 @@
 <template>
-  <div class="editor-tabs">
+  <div
+    class="editor-tabs"
+    @dblclick="handleBlankTabsDblClick"
+  >
     <div
       ref="tabContainer"
       class="scrollable-tabs"
@@ -89,6 +92,15 @@ const removeFileInTab = (file: IFileState) => {
 // Original methods
 const newFile = () => {
   editorStore.NEW_UNTITLED_TAB({})
+}
+
+const handleBlankTabsDblClick = (event: MouseEvent) => {
+  const target = event.target as HTMLElement | null
+  if (!target || target.closest('li, .new-file')) {
+    return
+  }
+
+  newFile()
 }
 
 const handleTabScroll = (event: WheelEvent) => {

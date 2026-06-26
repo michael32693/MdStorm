@@ -1,5 +1,6 @@
 import type { IFileState } from '@shared/types/files'
 import { getUniqueId, deepClone } from '../util'
+import { wordCount as getWordCount } from '@muyajs/core'
 
 // Helper module (NOT a Pinia store): defaults and factories for the editor
 // document state objects.
@@ -86,6 +87,10 @@ const documentStateKeys = [
   'notifications'
 ] as const satisfies ReadonlyArray<keyof IFileState>
 
+const shouldInitializeWordCount = (file: Pick<IFileState, 'markdown' | 'wordCount'>): boolean => {
+  return file.markdown.length > 0 && Object.values(file.wordCount).every((count) => count === 0)
+}
+
 export const getBlankFileState = (
   tabs: Array<{ pathname: string; filename: string }>,
   defaultEncoding: string = defaultFileStateWithoutId.encoding.encoding,
@@ -113,6 +118,7 @@ export const getBlankFileState = (
   }
 
   fileState.encoding.encoding = defaultEncoding
+  fileState.wordCount = getWordCount(markdown)
   return Object.assign(fileState, {
     lineEnding,
     adjustLineEndingOnSave: lineEnding.toLowerCase() === 'crlf',
@@ -144,6 +150,10 @@ export const createDocumentState = (
     if (src[key] !== undefined) {
       ;(docState as Record<string, unknown>)[key] = src[key]
     }
+  }
+
+  if (shouldInitializeWordCount(docState)) {
+    docState.wordCount = getWordCount(docState.markdown)
   }
 
   return Object.assign(docState, {

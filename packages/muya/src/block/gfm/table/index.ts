@@ -231,7 +231,7 @@ class Table extends Parent {
 
         // Capture the first row's surviving neighbour cell before mutation so
         // the caller can setCursor on a still-attached cell after the column
-        // detach. Applied per column since the new architecture removes one
+        // detach. Applied per column since the new design removes one
         // cell per row in a loop.
         const firstRow = table.firstChild as TableRow;
         const targetCellInFirstRow = firstRow.find(offset) as TableBodyCell | null;
