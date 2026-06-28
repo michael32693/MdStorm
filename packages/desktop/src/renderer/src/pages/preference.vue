@@ -98,9 +98,9 @@ onMounted(() => {
   & .notes {
     display: block;
     margin: 8px 0 0;
-    font-style: italic;
+    font-style: normal;
     font-size: 12px;
-    color: var(--editorColor80);
+    color: var(--editorColor50);
   }
 
   & .pref-content {

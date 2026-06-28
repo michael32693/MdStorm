@@ -3,7 +3,7 @@
     ref="fileEl"
     :title="file.pathname"
     class="side-bar-file"
-    :style="{ 'padding-left': `${depth * 20 + 10}px`, opacity: file.isMarkdown ? 1 : 0.75 }"
+    :style="{ 'padding-left': `${depth * 20 + 34}px` }"
     :class="[
       { current: currentFile?.pathname === file.pathname, active: file.id === activeItem.id }
     ]"
@@ -53,7 +53,12 @@ const { currentFile, tabs } = storeToRefs(editorStore)
 // from fileMixins
 const handleFileClick = (): void => {
   const { isMarkdown, pathname } = props.file
-  if (!isMarkdown) return
+  if (!isMarkdown) {
+    // Non-markdown / non-text files aren't editable within MdStorm — defer to
+    // the OS default handler so the sidebar click isn't a no-op.
+    window.electron.shell.openPath(pathname)
+    return
+  }
   const openedTab = tabs.value.find((f) => window.fileUtils.isSamePathSync(f.pathname, pathname))
   if (openedTab) {
     if (currentFile.value?.pathname === openedTab.pathname) {

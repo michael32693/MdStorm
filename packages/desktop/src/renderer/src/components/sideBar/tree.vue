@@ -48,10 +48,10 @@
           v-show="createCacheDirname === projectTree.pathname"
           ref="input"
           v-model="createName"
-          placeholder="Enter .md file name"
+          :placeholder="isCreateFile ? 'Enter .md file name' : ''"
           type="text"
           class="new-input"
-          :style="{ 'margin-left': `${(depth + 1) * 20 + 10}px` }"
+          :style="{ 'margin-left': `${depth * 20 + 34}px` }"
           @keypress.enter="handleInputEnter"
         >
         <file
@@ -109,8 +109,6 @@ import { useI18n } from 'vue-i18n'
 import { showContextMenu } from '../../contextMenu/sideBar'
 import CollapseDownIcon from '@/assets/icons/CollapseDown.svg'
 import CollapseRightIcon from '@/assets/icons/CollapseRight.svg'
-import FolderOpenedIcon from '@/assets/icons/FolderOpened.svg'
-import FolderClosedIcon from '@/assets/icons/FolderClosed.svg'
 import type { TreeNode } from './types'
 
 const { t } = useI18n()
@@ -142,6 +140,10 @@ const createCacheDirname = computed<string | undefined>(() => {
   const cache = createCache.value as { dirname?: string }
   return cache.dirname
 })
+const isCreateFile = computed<boolean>(() => {
+  const cache = createCache.value as { type?: string }
+  return cache.type === 'file'
+})
 
 // Methods
 const openFolder = (): void => {
@@ -166,14 +168,21 @@ const handleProjectContextMenu = (event: MouseEvent): void => {
 
 // From createFileOrDirectoryMixins
 const handleInputFocus = (): void => {
-  if (createCacheDirname.value === props.projectTree?.pathname) {
-    showDirectories.value = true
-  }
+  if (createCacheDirname.value !== props.projectTree?.pathname) return
+  showDirectories.value = true
 
+  const isFile = isCreateFile.value
   nextTick(() => {
-    if (input.value) {
-      input.value.focus()
-      createName.value = ''
+    if (!input.value) return
+    input.value.focus()
+    // Prefill `.md` for file creation so the caret lands just before the
+    // dot — typing the base name then Enter keeps the markdown extension.
+    createName.value = isFile ? '.md' : ''
+    if (isFile) {
+      // Wait for the DOM flush after the v-model write; calling
+      // setSelectionRange before the value lands would have the caret reset to
+      // the end once Vue's patch applies the new value.
+      nextTick(() => input.value?.setSelectionRange(0, 0))
     }
   })
 }

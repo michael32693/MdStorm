@@ -3,7 +3,12 @@ import fsPromises from 'fs/promises'
 import log from 'electron-log'
 import chokidar, { type FSWatcher } from 'chokidar'
 import { exists } from 'common/filesystem'
-import { hasMarkdownExtension, checkPathExcludePattern } from 'common/filesystem/paths'
+import {
+  hasMarkdownExtension,
+  checkPathExcludePattern,
+  parseFileExplorerExcludeRules,
+  matchFileExplorerRule
+} from 'common/filesystem/paths'
 import { getUniqueId } from '../utils'
 import { loadMarkdownFile } from '../filesystem/markdown'
 import { isLinux, isOsx } from '../config'
@@ -45,7 +50,8 @@ const add = async(
   endOfLine: LineEnding,
   autoGuessEncoding: boolean,
   trimTrailingNewline: number,
-  autoNormalizeLineEndings: boolean
+  autoNormalizeLineEndings: boolean,
+  onlyMarkdown: boolean
 ): Promise<void> => {
   const stats = await fsPromises.stat(pathname)
   const birthTime = stats.birthtime
@@ -91,6 +97,15 @@ const add = async(
         return
       }
     }
+    win.webContents.send(EVENT_NAME[type], {
+      type: 'add',
+      change: file
+    })
+  } else if (!onlyMarkdown) {
+    // Non-markdown file: only forward to the renderer when the file explorer
+    // is configured to show all file types (fileExplorerOnlyMarkdown=false).
+    // Markdown files above still carry a `data` payload (used by opened editor
+    // tabs); non-markdown entries in the sidebar don't need it.
     win.webContents.send(EVENT_NAME[type], {
       type: 'add',
       change: file
@@ -217,10 +232,26 @@ class Watcher {
         ) {
           return true
         }
-        if (fileInfo.isDirectory()) {
-          return false
+
+        const isDirectory = fileInfo.isDirectory()
+        const basename = path.basename(pathname)
+
+        // File-explorer filter: when "only markdown" is on (default), non-md
+        // files are dropped and the custom exclude rules are ignored. When
+        // it's off, md/non-md files are both listed and the user's custom
+        // rules filter by file or folder basename.
+        const onlyMarkdown = this._preferences.getItem<boolean>('fileExplorerOnlyMarkdown')
+        if (onlyMarkdown) {
+          return isDirectory ? false : !hasMarkdownExtension(pathname)
         }
-        return !hasMarkdownExtension(pathname)
+
+        const rules = parseFileExplorerExcludeRules(
+          this._preferences.getItem<string>('fileExplorerExcludeRules')
+        )
+        if (isDirectory) {
+          return matchFileExplorerRule(basename, rules.folderRules)
+        }
+        return matchFileExplorerRule(basename, rules.fileRules)
       },
       ignoreInitial: type === 'file',
       persistent: true,
@@ -253,6 +284,7 @@ class Watcher {
             trimTrailingNewline = 2,
             autoNormalizeLineEndings = false
           } = _preferences.getAll()
+          const onlyMarkdown = _preferences.getItem<boolean>('fileExplorerOnlyMarkdown')
           add(
             win,
             pathname,
@@ -260,7 +292,8 @@ class Watcher {
             eol,
             autoGuessEncoding,
             trimTrailingNewline,
-            autoNormalizeLineEndings
+            autoNormalizeLineEndings,
+            onlyMarkdown
           )
         }
       })

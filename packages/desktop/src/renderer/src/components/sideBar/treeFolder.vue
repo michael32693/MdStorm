@@ -58,7 +58,7 @@
         v-model="createName"
         type="text"
         class="new-input"
-        :style="{ 'margin-left': `${(depth + 1) * 20 + 10}px` }"
+        :style="{ 'margin-left': `${(depth + 1) * 20 + 34}px` }"
         @keypress.enter="handleInputEnter"
       >
       <File
@@ -116,11 +116,21 @@ const handleInputFocus = (): void => {
     return
   }
 
+  const cache = createCache.value as { type?: string }
+  const isFile = cache.type === 'file'
+
   isCollapsed.value = false
   nextTick(() => {
-    if (input.value) {
-      input.value.focus()
-      createName.value = ''
+    if (!input.value) return
+    input.value.focus()
+    // Prefill `.md` for file creation so the caret lands just before the
+    // dot — typing the base name then Enter keeps the markdown extension.
+    createName.value = isFile ? '.md' : ''
+    if (isFile) {
+      // Wait for the DOM flush after the v-model write; calling
+      // setSelectionRange before the value lands would have the caret reset to
+      // the end once Vue's patch applies the new value.
+      nextTick(() => input.value?.setSelectionRange(0, 0))
     }
   })
 }
@@ -191,7 +201,7 @@ onMounted(() => {
       border: 0;
       margin: 0;
       background: transparent;
-      cursor: pointer;
+      cursor: default;
       color: inherit;
     }
     & > .icon-arrow-collapsed {

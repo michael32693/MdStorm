@@ -56,6 +56,7 @@ const isTextFile = computed<boolean>(() => hasMarkdownExtension(props.name))
   height: 16px;
   margin-right: 5px;
   overflow: visible;
-  color: var(--sideBarIconColor);
+  /* SVG glyphs ship with a fixed muted gray fill (#9aa0a6) for a calmer,
+   * theme-independent file-tree appearance; remove `color` overrides here. */
 }
 </style>

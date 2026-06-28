@@ -9,6 +9,26 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
+// `pnpm run start` / `perf:inspect` set PERF_TESTING=true. Those commands use
+// `electron-vite preview`, which always runs a full production build before
+// launching Electron. The build output is only consumed locally and never
+// shipped, so we trade code size for build speed. The dominant cost is rollup
+// tree-shaking the ~7.5 MB renderer chunk (Element Plus + muya editor), so we
+// disable it for preview; we also skip esbuild minification, chunk-size gzip
+// reporting, and the stage-0 PostCSS transforms. Real platform builds
+// (build:win/mac/linux) do NOT set PERF_TESTING, so they keep the full
+// production pipeline.
+const fastPreview = process.env.PERF_TESTING === 'true'
+const fastBuild = fastPreview
+  ? {
+      minify: false,
+      reportCompressedSize: false,
+      chunkSizeWarningLimit: 4096,
+      rollupOptions: { treeshake: false }
+    }
+  : {}
+const fastPostcss = fastPreview ? { plugins: [] } : undefined
+
 export default defineConfig({
   main: {
     // --> Bundled as CommonJS
@@ -16,6 +36,7 @@ export default defineConfig({
     // electron-vite still builds the main and preload processes into commonJS
     // hence, we need to "exclude" (in order to NOT externalise) ESonly modules so that they can be converted to commonJS and can be required() afterwards correctly
     build: {
+      ...fastBuild,
       externalizeDeps: {
         // Bundle electron-store inline so it is available as a CommonJS
         // require() after electron-vite converts the main process output.
@@ -43,6 +64,7 @@ export default defineConfig({
     // (plus a few built-ins). Inline `pathe` (ESM-only) so the bundled preload
     // doesn't try to require it from node_modules at runtime.
     build: {
+      ...fastBuild,
       externalizeDeps: {
         exclude: ['pathe']
       }
@@ -92,8 +114,9 @@ export default defineConfig({
       }
     },
     plugins: [vue(), svgLoader()],
+    build: { ...fastBuild },
     css: {
-      postcss: {
+      postcss: fastPostcss ?? {
         plugins: [
           postcssPresetEnv({
             stage: 0,

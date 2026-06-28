@@ -123,3 +123,67 @@ export const checkPathExcludePattern = (pathname: string, patterns: readonly str
   }
   return false
 }
+
+/**
+ * Parsed form of the file-explorer custom exclude rules. Tokens with a `.` in
+ * them are treated as file-name rules (matched against the basename of files);
+ * tokens without a `.` are treated as folder-name rules (matched against the
+ * basename of directories). `*` is the only wildcard (no regex, no path
+ * segments). Whitespace around each token is trimmed.
+ */
+export interface FileExplorerExcludeRules {
+  fileRules: string[]
+  folderRules: string[]
+}
+
+/**
+ * Parse a raw rule string (comma- or semicolon-separated) into file/folder
+ * rule arrays. Empty/whitespace-only tokens are dropped.
+ */
+export const parseFileExplorerExcludeRules = (raw: string): FileExplorerExcludeRules => {
+  if (!raw || typeof raw !== 'string') {
+    return { fileRules: [], folderRules: [] }
+  }
+  const fileRules: string[] = []
+  const folderRules: string[] = []
+  for (const token of raw.split(/[,;]/)) {
+    const rule = token.trim()
+    if (!rule) continue
+    // A token containing a `.` is treated as a file-name rule (it has an
+    // extension); otherwise it targets directories by name.
+    if (rule.includes('.')) {
+      fileRules.push(rule)
+    } else {
+      folderRules.push(rule)
+    }
+  }
+  return { fileRules, folderRules }
+}
+
+/**
+ * Returns true if `name` matches any of the given glob patterns. Patterns use
+ * `*` as the only wildcard (no regex, no `**`, no brace expansion). `?` and
+ * other regex metacharacters are treated as literals.
+ */
+export const matchFileExplorerRule = (name: string, rules: readonly string[]): boolean => {
+  if (!name || rules.length === 0) return false
+  for (const rule of rules) {
+    if (globMatch(name, rule)) {
+      return true
+    }
+  }
+  return false
+}
+
+/**
+ * Lightweight `*`-only wildcard matcher. Escapes every regex metacharacter in
+ * the rule, converts each `*` into `.*`, and tests the whole string (anchored).
+ * Case sensitivity is left to the caller — here we match case-insensitively
+ * because matching by file/directory basename should be forgiving on macOS
+ * and Windows where the filesystem is case-insensitive by default.
+ */
+const globMatch = (name: string, rule: string): boolean => {
+  if (!rule) return false
+  const escaped = rule.replace(/[.+^${}()|[\]\\?]/g, '\\$&').replace(/\*/g, '.*')
+  return new RegExp(`^${escaped}$`, 'i').test(name)
+}

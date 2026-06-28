@@ -68,6 +68,8 @@ export interface IUserPreferences {
   autoNormalizeLineEndings?: boolean
   watcherUsePolling?: boolean
   treePathExcludePatterns?: string[]
+  fileExplorerOnlyMarkdown?: boolean
+  fileExplorerExcludeRules?: string
   [key: string]: unknown
 }
 

@@ -4,6 +4,16 @@
     "type": "boolean",
     "default": false
   },
+  "fileExplorerOnlyMarkdown": {
+    "description": "General--Whether the file explorer only shows markdown files.",
+    "type": "boolean",
+    "default": true
+  },
+  "fileExplorerExcludeRules": {
+    "description": "General--Custom exclude rules for the file explorer. Comma/semicolon separated, supports * wildcard, matches by file basename when a token has an extension, otherwise by directory basename. Only applied when fileExplorerOnlyMarkdown is false.",
+    "type": "string",
+    "default": ""
+  },
   "autoSaveDelay": {
     "description": "General--The time in ms after a change that the file is saved.",
     "type": "number",

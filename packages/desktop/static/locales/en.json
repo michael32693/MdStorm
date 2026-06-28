@@ -500,6 +500,12 @@
           "portuguese": "Português",
           "turkish": "Türkçe"
         }
+      },
+      "fileExplorer": {
+        "title": "File Explorer",
+        "onlyMarkdown": "Only show markdown files",
+        "excludeRules": "Custom exclude rules",
+        "excludeRulesNotes": "Comma or semicolon separated; supports * wildcard (not regex). Tokens with an extension hide files by name; tokens without an extension hide folders by name. Only applies when \"Only show markdown files\" is off."
       }
     },
     "editor": {

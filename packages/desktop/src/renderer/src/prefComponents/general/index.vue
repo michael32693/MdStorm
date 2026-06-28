@@ -28,6 +28,28 @@
     <compound>
       <template #head>
         <h6 class="title">
+          {{ t('preferences.general.fileExplorer.title') }}
+        </h6>
+      </template>
+      <template #children>
+        <bool
+          :description="t('preferences.general.fileExplorer.onlyMarkdown')"
+          :bool="fileExplorerOnlyMarkdown"
+          :on-change="(value) => onSelectChange('fileExplorerOnlyMarkdown', value)"
+        />
+        <text-box
+          v-if="!fileExplorerOnlyMarkdown"
+          :description="t('preferences.general.fileExplorer.excludeRules')"
+          :notes="t('preferences.general.fileExplorer.excludeRulesNotes')"
+          :input="fileExplorerExcludeRules"
+          :on-change="(value) => onSelectChange('fileExplorerExcludeRules', value)"
+        />
+      </template>
+    </compound>
+
+    <compound>
+      <template #head>
+        <h6 class="title">
           {{ t('preferences.general.window.title') }}
         </h6>
       </template>
@@ -214,6 +236,8 @@ const {
   openFilesInNewWindow,
   openFolderInNewWindow,
   treePathExcludePatterns: projectPaths,
+  fileExplorerOnlyMarkdown,
+  fileExplorerExcludeRules,
   zoom,
   hideScrollbar,
   wordWrapInToc,

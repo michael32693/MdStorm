@@ -500,6 +500,12 @@
           "portuguese": "Português",
           "turkish": "Türkçe"
         }
+      },
+      "fileExplorer": {
+        "title": "文件管理器",
+        "onlyMarkdown": "仅显示 Markdown 文件",
+        "excludeRules": "自定义排除规则",
+        "excludeRulesNotes": "半角逗号或分号分隔，支持 * 通配符（不支持正则）。带扩展名的项目按文件名屏蔽，不带扩展名的项目按文件夹名屏蔽；仅在关闭\"仅显示 Markdown 文件\"后显示和生效。"
       }
     },
     "editor": {
